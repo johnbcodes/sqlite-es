@@ -4,7 +4,7 @@ on:
     branches:
       - main
   schedule:
-    # Once a week on Tuesday at 2:15 UTC / 9:15 EST / 10:15 EDT
+    # Once a week on Tuesday at 14:15 UTC / 09:15 EST / 10:15 EDT
     - cron: '15 14 * * 2'
 
 jobs:
