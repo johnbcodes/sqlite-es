@@ -1,0 +1,25 @@
+[package]
+name = "sqlite-es"
+version = "0.4.5"
+authors = ["John Bledsoe",
+           "Dave Garred <dave.garred@serverlesstechnology.com>"]
+edition = "2021"
+license = "Apache-2.0"
+keywords = ["cqrs", "event-sourcing", "serverless", "sqlite"]
+description = "An SQLite implementation of an event repository for cqrs-es."
+repository = "https://github.com/johnbcodes/sqlite-es"
+documentation = "https://docs.rs/sqlite-es"
+readme = "README.md"
+
+[dependencies]
+cqrs-es = "0.4.5"
+
+async-trait = "0.1"
+futures = "0.3"
+serde = { version = "1.0", features = ["derive"]}
+serde_json = "1.0"
+sqlx = { version = "0.6", features = [ "json", "runtime-tokio-rustls", "sqlite" ] }
+tokio = { version = "1", features = ["rt"] }
+
+[dev-dependencies]
+uuid = { version = "1.1", features = ["v4"]}
