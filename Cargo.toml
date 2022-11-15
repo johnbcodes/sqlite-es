@@ -5,7 +5,7 @@ authors = ["John Bledsoe",
            "Dave Garred <dave.garred@serverlesstechnology.com>"]
 edition = "2021"
 license = "Apache-2.0"
-keywords = ["cqrs", "event-sourcing", "serverless", "sqlite"]
+keywords = ["cqrs", "event-sourcing", "sqlite"]
 description = "An SQLite implementation of an event repository for cqrs-es."
 repository = "https://github.com/johnbcodes/sqlite-es"
 documentation = "https://docs.rs/sqlite-es"
