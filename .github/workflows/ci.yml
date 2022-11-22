@@ -70,10 +70,10 @@ jobs:
           override: true
           components: rustfmt, clippy
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v2
+        uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --check
