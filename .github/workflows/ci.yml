@@ -73,7 +73,7 @@ jobs:
       - uses: Swatinem/rust-cache@v1
 
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v2
         with:
           command: fmt
           args: --all -- --check
