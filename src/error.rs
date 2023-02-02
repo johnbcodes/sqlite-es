@@ -15,9 +15,9 @@ impl Display for SqliteAggregateError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             SqliteAggregateError::OptimisticLock => write!(f, "optimistic lock error"),
-            SqliteAggregateError::UnknownError(error) => write!(f, "{}", error),
-            SqliteAggregateError::DeserializationError(error) => write!(f, "{}", error),
-            SqliteAggregateError::ConnectionError(error) => write!(f, "{}", error),
+            SqliteAggregateError::UnknownError(error) => write!(f, "{error}"),
+            SqliteAggregateError::DeserializationError(error) => write!(f, "{error}"),
+            SqliteAggregateError::ConnectionError(error) => write!(f, "{error}"),
         }
     }
 }
