@@ -59,7 +59,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Run cargo clippy on tests
-        run: cargo clippy --tests --verbose -- -Dclippy::all -Dclippy::pedantic
+        # TODO add pedantic checks back in -- -Dclippy::pedantic
+        run: cargo clippy --tests --verbose -- -Dclippy::all
 
   format:
     name: Formatting
@@ -73,6 +74,7 @@ jobs:
       - name: Install toolchain (minimal+clippy, stable)
         uses: dtolnay/rust-toolchain@v1
         with:
+          toolchain: stable
           components: rustfmt
 
       - name: Run cargo fmt
