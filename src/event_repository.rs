@@ -240,7 +240,7 @@ impl SqliteEventRepository {
             .bind(current_sequence as i32)
             .bind(current_snapshot as i32)
             .bind(&aggregate_payload)
-            .execute(&mut tx)
+            .execute(&mut *tx)
             .await?;
         tx.commit().await?;
         Ok(())
@@ -266,7 +266,7 @@ impl SqliteEventRepository {
             .bind(A::aggregate_type())
             .bind(aggregate_id.as_str())
             .bind((current_snapshot - 1) as i32)
-            .execute(&mut tx)
+            .execute(&mut *tx)
             .await?;
         tx.commit().await?;
         match result.rows_affected() {
@@ -333,7 +333,7 @@ impl SqliteEventRepository {
                 .bind(event_version)
                 .bind(&payload)
                 .bind(&metadata)
-                .execute(&mut *tx)
+                .execute(&mut **tx)
                 .await?;
         }
         Ok(current_sequence)
