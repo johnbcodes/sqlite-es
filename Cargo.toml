@@ -12,7 +12,7 @@ documentation = "https://docs.rs/sqlite-es"
 readme = "README.md"
 
 [dependencies]
-cqrs-es = "0.4.9"
+cqrs-es = "~0.4"
 
 async-trait = "0.1"
 futures = "0.3"
