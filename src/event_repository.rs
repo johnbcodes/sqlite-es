@@ -413,7 +413,7 @@ mod test {
     async fn verify_replay_stream(id: &str, event_repo: SqliteEventRepository) {
         let mut stream = event_repo.stream_events::<TestAggregate>(id).await.unwrap();
         let mut found_in_stream = 0;
-        while (stream.next::<TestAggregate>().await).is_some() {
+        while (stream.next::<TestAggregate>(&Option::None).await).is_some() {
             found_in_stream += 1;
         }
         assert_eq!(found_in_stream, 2);
@@ -423,7 +423,7 @@ mod test {
             .await
             .unwrap();
         let mut found_in_stream = 0;
-        while (stream.next::<TestAggregate>().await).is_some() {
+        while (stream.next::<TestAggregate>(&Option::None).await).is_some() {
             found_in_stream += 1;
         }
         assert!(found_in_stream >= 2);
