@@ -39,7 +39,9 @@ where
     pub fn new(view_name: &str, pool: Pool<Sqlite>) -> Self {
         let insert_sql =
             format!("INSERT INTO {view_name} (payload, version, view_id) VALUES ( ?, ?, ? )");
-        let update_sql = format!("UPDATE {view_name} SET payload= ? , version= ? WHERE view_id= ?");
+        let update_sql = format!(
+            "UPDATE {view_name} SET payload= ? , version= ? WHERE view_id= ? AND version= ?"
+        );
         let select_sql = format!("SELECT version,payload FROM {view_name} WHERE view_id= ?");
         Self {
             insert_sql,
@@ -99,13 +101,18 @@ where
         };
         let version = context.version + 1;
         let payload = serde_json::to_value(&view).map_err(SqliteAggregateError::from)?;
-        sqlx::query(sql.as_str())
+        let rows_affected = sqlx::query(sql.as_str())
             .bind(payload)
             .bind(version)
             .bind(context.view_instance_id)
+            .bind(context.version)
             .execute(&self.pool)
             .await
-            .map_err(SqliteAggregateError::from)?;
+            .map_err(SqliteAggregateError::from)?
+            .rows_affected();
+        if rows_affected < 1 {
+            return Err(PersistenceError::OptimisticLockError);
+        }
         Ok(())
     }
 }
