@@ -1,6 +1,6 @@
 [package]
 name = "sqlite-es"
-version = "0.4.12"
+version = "0.4.13"
 authors = ["John Bledsoe",
            "Dave Garred <dave.garred@serverlesstechnology.com>"]
 edition = "2021"
