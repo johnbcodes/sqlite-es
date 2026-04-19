@@ -1,7 +1,7 @@
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::SqliteViewRepository;
-    use async_trait::async_trait;
+    use cqrs_es::event_sink::EventSink;
     use cqrs_es::persist::{GenericQuery, SerializedEvent, SerializedSnapshot};
     use cqrs_es::{Aggregate, DomainEvent, EventEnvelope, View};
     use serde::{Deserialize, Serialize};
@@ -15,23 +15,20 @@ pub(crate) mod tests {
         pub(crate) tests: Vec<String>,
     }
 
-    #[async_trait]
     impl Aggregate for TestAggregate {
         type Command = TestCommand;
         type Event = TestEvent;
         type Error = TestError;
         type Services = TestServices;
-
-        fn aggregate_type() -> String {
-            "TestAggregate".to_string()
-        }
+        const TYPE: &'static str = "TestAggregate";
 
         async fn handle(
-            &self,
+            &mut self,
             _command: Self::Command,
             _services: &Self::Services,
-        ) -> Result<Vec<Self::Event>, Self::Error> {
-            Ok(vec![])
+            _sink: &EventSink<Self>,
+        ) -> Result<(), Self::Error> {
+            Ok(())
         }
 
         fn apply(&mut self, _e: Self::Event) {}
@@ -124,7 +121,7 @@ pub(crate) mod tests {
         SerializedEvent {
             aggregate_id: id.to_string(),
             sequence,
-            aggregate_type: TestAggregate::aggregate_type(),
+            aggregate_type: TestAggregate::TYPE.to_string(),
             event_type: event.event_type(),
             event_version: event.event_version(),
             payload,
