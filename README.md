@@ -13,8 +13,8 @@ Add to your Cargo.toml file:
 
 ```toml
 [dependencies]
-cqrs-es = "0.4.5"
-sqlite-es = "0.4.5"
+cqrs-es = "0.5"
+sqlite-es = "0.5"
 ```
 
 A simple configuration example:

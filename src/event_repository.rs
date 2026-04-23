@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use cqrs_es::persist::{
     PersistedEventRepository, PersistenceError, ReplayStream, SerializedEvent, SerializedSnapshot,
 };
@@ -23,7 +22,6 @@ pub struct SqliteEventRepository {
     stream_channel_size: usize,
 }
 
-#[async_trait]
 impl PersistedEventRepository for SqliteEventRepository {
     async fn get_events<A: Aggregate>(
         &self,
@@ -47,7 +45,7 @@ impl PersistedEventRepository for SqliteEventRepository {
         aggregate_id: &str,
     ) -> Result<Option<SerializedSnapshot>, PersistenceError> {
         let row: SqliteRow = match sqlx::query(self.query_factory.select_snapshot())
-            .bind(A::aggregate_type())
+            .bind(A::TYPE)
             .bind(aggregate_id)
             .fetch_optional(&self.pool)
             .await
@@ -89,7 +87,7 @@ impl PersistedEventRepository for SqliteEventRepository {
     ) -> Result<ReplayStream, PersistenceError> {
         Ok(stream_events(
             self.query_factory.select_events().to_string(),
-            A::aggregate_type(),
+            A::TYPE.to_string(),
             aggregate_id.to_string(),
             self.pool.clone(),
             self.stream_channel_size,
@@ -100,7 +98,7 @@ impl PersistedEventRepository for SqliteEventRepository {
     async fn stream_all_events<A: Aggregate>(&self) -> Result<ReplayStream, PersistenceError> {
         Ok(stream_events(
             self.query_factory.all_events().to_string(),
-            A::aggregate_type(),
+            A::TYPE.to_string(),
             "".to_string(),
             self.pool.clone(),
             self.stream_channel_size,
@@ -140,7 +138,7 @@ impl SqliteEventRepository {
         query: &str,
     ) -> Result<Vec<SerializedEvent>, PersistenceError> {
         let mut rows = sqlx::query(query)
-            .bind(A::aggregate_type())
+            .bind(A::TYPE)
             .bind(aggregate_id)
             .fetch(&self.pool);
         let mut result: Vec<SerializedEvent> = Default::default();
@@ -235,7 +233,7 @@ impl SqliteEventRepository {
             .persist_events::<A>(self.query_factory.insert_event(), &mut tx, events)
             .await?;
         sqlx::query(self.query_factory.insert_snapshot())
-            .bind(A::aggregate_type())
+            .bind(A::TYPE)
             .bind(aggregate_id.as_str())
             .bind(current_sequence as i32)
             .bind(current_snapshot as i32)
@@ -263,7 +261,7 @@ impl SqliteEventRepository {
             .bind(current_sequence as i32)
             .bind(&aggregate_payload)
             .bind(current_snapshot as i32)
-            .bind(A::aggregate_type())
+            .bind(A::TYPE)
             .bind(aggregate_id.as_str())
             .bind((current_snapshot - 1) as i32)
             .execute(&mut *tx)
@@ -326,7 +324,7 @@ impl SqliteEventRepository {
             let payload = serde_json::to_value(&event.payload)?;
             let metadata = serde_json::to_value(&event.metadata)?;
             sqlx::query(inser_event_query)
-                .bind(A::aggregate_type())
+                .bind(A::TYPE)
                 .bind(event.aggregate_id.as_str())
                 .bind(event.sequence as i32)
                 .bind(event_type)
@@ -413,7 +411,7 @@ mod test {
     async fn verify_replay_stream(id: &str, event_repo: SqliteEventRepository) {
         let mut stream = event_repo.stream_events::<TestAggregate>(id).await.unwrap();
         let mut found_in_stream = 0;
-        while (stream.next::<TestAggregate>(&Option::None).await).is_some() {
+        while (stream.next::<TestAggregate>(&[]).await).is_some() {
             found_in_stream += 1;
         }
         assert_eq!(found_in_stream, 2);
@@ -423,7 +421,7 @@ mod test {
             .await
             .unwrap();
         let mut found_in_stream = 0;
-        while (stream.next::<TestAggregate>(&Option::None).await).is_some() {
+        while (stream.next::<TestAggregate>(&[]).await).is_some() {
             found_in_stream += 1;
         }
         assert!(found_in_stream >= 2);
